@@ -5,7 +5,7 @@ license-file:    LICENSE
 author:          Myles C. Maxfield <myles.maxfield@gmail.com>
 maintainer:      Myles C. Maxfield <myles.maxfield@gmail.com>
 synopsis:        Encode unicode strings to ascii forms according to RFC 3492
-description:     Encode unicode strings to ascii forms according to RFC 3492
+description:     Encode unicode strings to ascii forms according to RFC 3492. It is written in pure Haskell, as opposed to gnuidn's Data.Text.IDN.Punycode
 category:        Text, Web
 stability:       Experimental
 cabal-version:   >= 1.8
