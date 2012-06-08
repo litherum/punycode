@@ -18,6 +18,9 @@ library
                  , cereal
                  , mtl
     exposed-modules: Data.Punycode
+    other-modules:   Data.Punycode.Encode
+                   , Data.Punycode.Decode
+                   , Data.Punycode.Shared
     ghc-options:     -Wall
 
 Test-Suite test-punycode

@@ -7,7 +7,7 @@ import           Data.Word
 
 import           Data.Punycode.Shared
 
- -- | Decode a string into its unicode form
+-- | Decode a string into its unicode form
 decode :: BS.ByteString -> String
 decode input = let Right out = runGet (inner2 initial_n 0 initial_bias before) after in out
   where (before, after)
