@@ -1,11 +1,11 @@
-module Data.Punycode.Decode (decode) where
+module Data.Text.Punycode.Decode (decode) where
 
 import qualified Data.ByteString as BS
 import           Data.Char
 import           Data.Serialize hiding (decode)
 import           Data.Word
 
-import           Data.Punycode.Shared
+import           Data.Text.Punycode.Shared
 
 -- | Decode a string into its unicode form
 decode :: BS.ByteString -> String

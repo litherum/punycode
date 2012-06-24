@@ -1,6 +1,6 @@
 {-# LANGUAGE FlexibleContexts #-}
 
-module Data.Punycode.Encode (encode) where
+module Data.Text.Punycode.Encode (encode) where
 
 import           Control.Monad.State hiding (state)
 import           Control.Monad.Writer
@@ -8,7 +8,7 @@ import qualified Data.ByteString as BS
 import           Data.Char
 import           Data.Word
 
-import           Data.Punycode.Shared
+import           Data.Text.Punycode.Shared
 
 data PunycodeState = PunycodeState { n :: Int
                                    , delta :: Int

@@ -17,10 +17,10 @@ library
                  , bytestring
                  , cereal
                  , mtl
-    exposed-modules: Data.Punycode
-    other-modules:   Data.Punycode.Encode
-                   , Data.Punycode.Decode
-                   , Data.Punycode.Shared
+    exposed-modules: Data.Text.Punycode
+    other-modules:   Data.Text.Punycode.Encode
+                   , Data.Text.Punycode.Decode
+                   , Data.Text.Punycode.Shared
     ghc-options:     -Wall
 
 Test-Suite test-punycode

@@ -1,4 +1,4 @@
-module Data.Punycode.Shared where
+module Data.Text.Punycode.Shared where
 
 base :: Int
 base = 36
