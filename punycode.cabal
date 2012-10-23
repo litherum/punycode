@@ -1,11 +1,11 @@
 name:            punycode
-version:         0.5
+version:         1.0
 license:         BSD3
 license-file:    LICENSE
 author:          Myles C. Maxfield <myles.maxfield@gmail.com>
-maintainer:      Myles C. Maxfield <myles.maxfield@gmail.com>
-synopsis:        Encode unicode strings to ascii forms according to RFC 3492
-description:     Encode unicode strings to ascii forms according to RFC 3492. It is written in pure Haskell, as opposed to gnuidn's Data.Text.IDN.Punycode
+maintainer:      None
+synopsis:        DEPRECATED: Use Data.Encoding.BootString from the 'encoding' package.
+description:     DEPRECATED: Use Data.Encoding.BootString from the 'encoding' package.
 category:        Text, Web
 stability:       Experimental
 cabal-version:   >= 1.8
@@ -32,6 +32,8 @@ Test-Suite test-punycode
                  , mtl
                  , HUnit
                  , QuickCheck
+                 , encoding
+                 , binary
 
 source-repository head
   type:     git
