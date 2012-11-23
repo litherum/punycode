@@ -1,5 +1,5 @@
 name:            punycode
-version:         0.5
+version:         1.0
 license:         BSD3
 license-file:    LICENSE
 author:          Myles C. Maxfield <myles.maxfield@gmail.com>
@@ -17,6 +17,7 @@ library
                  , bytestring
                  , cereal
                  , mtl
+                 , text
     exposed-modules: Data.Text.Punycode
     other-modules:   Data.Text.Punycode.Encode
                    , Data.Text.Punycode.Decode
@@ -30,6 +31,7 @@ Test-Suite test-punycode
                  , bytestring
                  , cereal
                  , mtl
+                 , text
                  , HUnit
                  , QuickCheck
 

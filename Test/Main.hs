@@ -1,5 +1,6 @@
 import qualified Data.ByteString as BS
 import           Data.Char
+import qualified Data.Text as T
 import           System.Exit
 import           Test.HUnit
 import           Test.QuickCheck
@@ -115,15 +116,16 @@ hunittests = TestList [encodeTests, decodeTests]
   where encodeTests = TestList $ map f tests
           where f (decoded, encoded, testname) = TestCase (assertEqual testname
                   (BS.pack $ map (fromIntegral . ord . toLower) encoded)
-                  (encode $ map (toLower . chr) decoded))
+                  (encode $ T.pack $ map (toLower . chr) decoded))
         decodeTests = TestList $ map f tests
           where f (decoded, encoded, testname) = TestCase (assertEqual testname
-                  (map (toLower . chr) decoded)
+                  (T.pack $ map (toLower . chr) decoded)
                   (decode $ BS.pack $ map (fromIntegral . ord . toLower) encoded))
 
 main :: IO ()
 main = do
-  result <- quickCheckResult (\ s -> decode (encode s) == s)
+  -- Work around the fact that there is no Arbitrary instance for Text
+  result <- quickCheckResult (\ s -> T.unpack (decode $ encode $ T.pack s) == s)
   counts <- runTestTT hunittests
   case (errors counts, failures counts, result) of
     (0, 0, Success {}) -> exitSuccess

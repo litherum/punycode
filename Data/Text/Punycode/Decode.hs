@@ -3,20 +3,22 @@ module Data.Text.Punycode.Decode (decode) where
 import qualified Data.ByteString as BS
 import           Data.Char
 import           Data.Serialize hiding (decode)
+import qualified Data.Text as T
+import qualified Data.Text.Encoding as TE
 import           Data.Word
 
 import           Data.Text.Punycode.Shared
 
 -- | Decode a string into its unicode form
-decode :: BS.ByteString -> String
+decode :: BS.ByteString -> T.Text
 decode input = let Right out = runGet (inner2 initial_n 0 initial_bias before) after in out
   where (before, after)
-          | BS.any f input = (init $ map (chr . fromIntegral) $ BS.unpack b1, a1)
-          | otherwise = ("", input)
+          | BS.any f input = (TE.decodeUtf8 $ BS.init b1, a1)
+          | otherwise = (T.empty, input)
         f = (== (fromIntegral $ ord '-'))
         (b1, a1) = BS.breakEnd f input
 
-inner2 :: Int -> Int -> Int -> String -> Get String
+inner2 :: Int -> Int -> Int -> T.Text -> Get T.Text
 inner2 n oldi bias output = do
   b <- isEmpty
   helper b
@@ -24,9 +26,9 @@ inner2 n oldi bias output = do
           i <- inner base 1 oldi bias
           helper' i
           where helper' i = inner2 n' (i' + 1) bias' output'
-                  where bias' = adapt (i - oldi) (length output + 1) (oldi == 0)
-                        n' = n + i `div` (length output + 1)
-                        i' = i `mod` (length output + 1)
+                  where bias' = adapt (i - oldi) (T.length output + 1) (oldi == 0)
+                        n' = n + i `div` (T.length output + 1)
+                        i' = i `mod` (T.length output + 1)
                         output' = insertInto output n' i'
         helper True = return output
 
@@ -44,8 +46,8 @@ inner k w i bias = do
                   | k >= bias + tmax = tmax
                   | otherwise = k - bias
 
-insertInto :: String -> Int -> Int -> String
-insertInto input n i = take i input ++ [chr n] ++ drop i input
+insertInto :: T.Text -> Int -> Int -> T.Text
+insertInto input n i = T.concat [T.take i input, T.singleton $ chr n, T.drop i input]
 
 word8ToDigit :: Word8 -> Int
 word8ToDigit = helper . fromIntegral

@@ -6,6 +6,8 @@ import           Control.Monad.State hiding (state)
 import           Control.Monad.Writer
 import qualified Data.ByteString as BS
 import           Data.Char
+import qualified Data.Text as T
+import qualified Data.Text.Encoding as TE
 import           Data.Word
 
 import           Data.Text.Punycode.Shared
@@ -17,19 +19,19 @@ data PunycodeState = PunycodeState { n :: Int
                                    }
 
 -- | Encode a string into its ascii form
-encode :: String -> BS.ByteString
-encode input = execWriter $ initialWriter input
+encode :: T.Text -> BS.ByteString
+encode = execWriter . initialWriter
 
-initialWriter :: MonadWriter BS.ByteString m => String -> m ()
+initialWriter :: MonadWriter BS.ByteString m => T.Text -> m ()
 initialWriter input = do
   tell basics
   when (b > 0) $ tell $ BS.singleton $ fromIntegral $ ord '-'
-  evalStateT (inner3 (map ord input) b) $ PunycodeState { n = initial_n
-                                                             , delta = 0
-                                                             , bias = initial_bias
-                                                             , h = b
-                                                             }
-  where basics = BS.pack $ map (fromIntegral . ord) $ filter isBasic input
+  evalStateT (inner3 (map ord $ T.unpack input) b) $ PunycodeState { n = initial_n
+                                                                   , delta = 0
+                                                                   , bias = initial_bias
+                                                                   , h = b
+                                                                   }
+  where basics = TE.encodeUtf8 $ T.filter isBasic input
         b = BS.length basics
 
 inner3 :: (MonadState PunycodeState m, MonadWriter BS.ByteString m) => [Int] -> Int -> m ()
