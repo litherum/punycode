@@ -1,4 +1,4 @@
-module Data.Text.Punycode.Decode {-# DEPRECATED "Use Data.Encoding.BootString from the 'encoding' package instead" #-} (decode) where
+module Data.Text.Punycode.Decode (decode) where
 
 import qualified Data.ByteString as BS
 import           Data.Char
@@ -6,8 +6,6 @@ import           Data.Serialize hiding (decode)
 import           Data.Word
 
 import           Data.Text.Punycode.Shared
-
-{-# DEPRECATED decode "Use Data.Encoding.BootString from the 'encoding' package instead" #-}
 
 -- | Decode a string into its unicode form
 decode :: BS.ByteString -> String

@@ -1,15 +1,10 @@
-import qualified Data.ByteString      as BS
-import qualified Data.ByteString.Lazy as LBS
+import qualified Data.ByteString as BS
 import           Data.Char
-import           Data.Binary.Get
-import           Data.Binary.Put
-import           Data.Encoding
-import           Data.Encoding.BootString
 import           System.Exit
 import           Test.HUnit
 import           Test.QuickCheck
 
---import Data.Text.Punycode
+import Data.Text.Punycode
 
 tests = [( [0x0644, 0x064A, 0x0647, 0x0645, 0x0627, 0x0628, 0x062A, 0x0643, 0x0644,
             0x0645, 0x0648, 0x0634, 0x0639, 0x0631, 0x0628, 0x064A, 0x061F]
@@ -116,31 +111,19 @@ tests = [( [0x0644, 0x064A, 0x0647, 0x0645, 0x0627, 0x0628, 0x062A, 0x0643, 0x06
          )
         ]
 
-lazyToStrict :: LBS.ByteString -> BS.ByteString
-lazyToStrict = BS.concat . LBS.toChunks
-
-strictToLazy :: BS.ByteString -> LBS.ByteString
-strictToLazy = LBS.fromChunks . return
-
-encode' :: String -> BS.ByteString
-encode' = lazyToStrict . runPut . encode punycode
-
-decode' :: BS.ByteString -> String
-decode' = runGet (decode punycode) . strictToLazy
-
 hunittests = TestList [encodeTests, decodeTests]
   where encodeTests = TestList $ map f tests
           where f (decoded, encoded, testname) = TestCase (assertEqual testname
                   (BS.pack $ map (fromIntegral . ord . toLower) encoded)
-                  (encode' $ map (toLower . chr) decoded))
+                  (encode $ map (toLower . chr) decoded))
         decodeTests = TestList $ map f tests
           where f (decoded, encoded, testname) = TestCase (assertEqual testname
                   (map (toLower . chr) decoded)
-                  (decode' $ BS.pack $ map (fromIntegral . ord . toLower) encoded))
+                  (decode $ BS.pack $ map (fromIntegral . ord . toLower) encoded))
 
 main :: IO ()
 main = do
-  result <- quickCheckResult (\ s -> decode' (encode' s) == s)
+  result <- quickCheckResult (\ s -> decode (encode s) == s)
   counts <- runTestTT hunittests
   case (errors counts, failures counts, result) of
     (0, 0, Success {}) -> exitSuccess

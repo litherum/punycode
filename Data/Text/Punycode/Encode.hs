@@ -1,6 +1,6 @@
 {-# LANGUAGE FlexibleContexts #-}
 
-module Data.Text.Punycode.Encode {-# DEPRECATED "Use Data.Encoding.BootString from the 'encoding' package instead" #-} (encode) where
+module Data.Text.Punycode.Encode (encode) where
 
 import           Control.Monad.State hiding (state)
 import           Control.Monad.Writer
@@ -9,8 +9,6 @@ import           Data.Char
 import           Data.Word
 
 import           Data.Text.Punycode.Shared
-
-{-# DEPRECATED encode "Use Data.Encoding.BootString from the 'encoding' package instead" #-}
 
 data PunycodeState = PunycodeState { n :: Int
                                    , delta :: Int
