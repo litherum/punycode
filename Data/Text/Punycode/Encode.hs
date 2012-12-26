@@ -80,9 +80,6 @@ inner q k bias'
           | k >= bias' + tmax = tmax
           | otherwise = k - bias'
 
-isBasic :: Char -> Bool
-isBasic = (< initial_n) . ord
-
 baseToAscii :: Int -> Word8
 baseToAscii i
   | i < 26 = fromIntegral $ i + (ord 'a')

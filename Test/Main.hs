@@ -1,6 +1,9 @@
 import qualified Data.ByteString as BS
 import           Data.Char
+import qualified Data.Encoding as E
+import qualified Data.Encoding.BootString as EB
 import qualified Data.Text as T
+import           Data.Word (Word8)
 import           System.Exit
 import           Test.HUnit
 import           Test.QuickCheck
@@ -119,14 +122,43 @@ hunittests = TestList [encodeTests, decodeTests]
                   (encode $ T.pack $ map (toLower . chr) decoded))
         decodeTests = TestList $ map f tests
           where f (decoded, encoded, testname) = TestCase (assertEqual testname
-                  (T.pack $ map (toLower . chr) decoded)
+                  (Right $ T.pack $ map (toLower . chr) decoded)
                   (decode $ BS.pack $ map (fromIntegral . ord . toLower) encoded))
+
+-- Work around the fact that there is no Arbitrary instance for Text
+inverseTest :: String -> Bool
+inverseTest s
+  | all isAscii s = True
+  | otherwise = case decoded of
+  Left _ -> False
+  Right x -> x == packed
+  where packed = T.pack s
+        decoded = decode $ encode packed
+
+matchesEncodingDecodeTest :: [Word8] -> Bool
+matchesEncodingDecodeTest = helper . BS.pack
+  where helper s = helper1 (decode s) (E.decodeStrictByteStringExplicit EB.punycode s)
+          where helper1 (Right m) (Right t) = m == T.pack t
+                helper1 (Left _) (Left _) = True
+                helper1 _ _ = False
+
+matchesEncodingEncodeTest :: String -> Bool
+matchesEncodingEncodeTest s = helper (encode $ T.pack s) (E.encodeStrictByteStringExplicit EB.punycode s)
+  where helper m (Right t) = m == t
+        helper _ _ = False
+
+internalStringIsNeverTooShort :: [Word8] -> Bool
+internalStringIsNeverTooShort s = case decode $ BS.pack s of
+  Left InternalStringTooShort -> False
+  _ -> True
 
 main :: IO ()
 main = do
-  -- Work around the fact that there is no Arbitrary instance for Text
-  result <- quickCheckResult (\ s -> T.unpack (decode $ encode $ T.pack s) == s)
+  result1 <- quickCheckWithResult (stdArgs {maxSuccess = 100000, maxSize = 100}) inverseTest
+  result2 <- quickCheckWithResult (stdArgs {maxSuccess = 100000, maxSize = 100}) matchesEncodingDecodeTest
+  result3 <- quickCheckWithResult (stdArgs {maxSuccess = 100000, maxSize = 100}) matchesEncodingEncodeTest
+  result4 <- quickCheckWithResult (stdArgs {maxSuccess = 100000, maxSize = 100}) internalStringIsNeverTooShort
   counts <- runTestTT hunittests
-  case (errors counts, failures counts, result) of
-    (0, 0, Success {}) -> exitSuccess
+  case (errors counts, failures counts, result1, result2, result3, result4) of
+    (0, 0, Success {}, Success {}, Success {}, Success {}) -> exitSuccess
     _ -> exitFailure

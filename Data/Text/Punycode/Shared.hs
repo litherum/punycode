@@ -1,5 +1,7 @@
 module Data.Text.Punycode.Shared where
 
+import Data.Char (ord)
+
 base :: Int
 base = 36
 
@@ -30,3 +32,6 @@ adapt delta numpoints firsttime = helper
         loop k delta'
           | delta' > ((base - tmin) * tmax) `div` 2 = loop (k + base) $ delta' `div` (base - tmin)
           | otherwise = k + (((base - tmin + 1) * delta') `div` (delta' + skew))
+
+isBasic :: Char -> Bool
+isBasic = (< initial_n) . ord
