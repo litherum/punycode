@@ -19,6 +19,7 @@ data PunycodeDecodeException
        | RightOfHyphenShouldBeAlphanumeric
        | LeftOfHyphenShouldBeBasic
        | CantStartWithDash
+       | InvalidCodePoint
     deriving (Eq,Show,Typeable)
 
 instance Exception PunycodeDecodeException
@@ -47,8 +48,8 @@ inner2 n oldi bias output = do
           helper' i
           where helper' Nothing = return $ Left RightOfHyphenShouldBeAlphanumeric
                 helper' (Just i) = case output' of
-                  Just output'' -> inner2 n' (i' + 1) bias' output''
-                  Nothing -> return $ Left InternalStringTooShort
+                  Right output'' -> inner2 n' (i' + 1) bias' output''
+                  Left err -> return $ Left err
                   where bias' = adapt (i - oldi) (T.length output + 1) (oldi == 0)
                         n' = n + i `div` (T.length output + 1)
                         i' = i `mod` (T.length output + 1)
@@ -70,10 +71,18 @@ inner k w i bias = do
                   | k >= bias + tmax = tmax
                   | otherwise = k - bias
 
-insertInto :: T.Text -> Int -> Int -> Maybe T.Text
+insertInto :: T.Text -> Int -> Int -> Either PunycodeDecodeException T.Text
 insertInto input n i
-  | T.length input < i = Nothing
-  | otherwise = Just $ T.concat [T.take i input, T.singleton $ chr n, T.drop i input]
+  | T.length input < i = Left InternalStringTooShort
+  | otherwise = case n' of
+    Just n'' -> Right $ T.concat [T.take i input, T.singleton n'', T.drop i input]
+    Nothing -> Left InvalidCodePoint
+  where n' = safeChr n
+
+safeChr :: Int -> Maybe Char
+safeChr x
+  | x >= 0 && x <= fromEnum (maxBound :: Char) = Just $ chr x
+  | otherwise = Nothing
 
 word8ToDigit :: Word8 -> Maybe Int
 word8ToDigit = helper . fromIntegral
