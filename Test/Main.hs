@@ -154,10 +154,10 @@ internalStringIsNeverTooShort s = case decode $ BS.pack s of
 
 main :: IO ()
 main = do
-  result1 <- quickCheckWithResult (stdArgs {maxSuccess = 100000, maxSize = 100}) inverseTest
-  result2 <- quickCheckWithResult (stdArgs {maxSuccess = 100000, maxSize = 100}) matchesEncodingDecodeTest
-  result3 <- quickCheckWithResult (stdArgs {maxSuccess = 100000, maxSize = 100}) matchesEncodingEncodeTest
-  result4 <- quickCheckWithResult (stdArgs {maxSuccess = 100000, maxSize = 100}) internalStringIsNeverTooShort
+  result1 <- quickCheckWithResult (stdArgs {maxSuccess = 1000000, maxSize = 100}) inverseTest
+  result2 <- quickCheckWithResult (stdArgs {maxSuccess = 1000000, maxSize = 100}) matchesEncodingDecodeTest
+  result3 <- quickCheckWithResult (stdArgs {maxSuccess = 1000000, maxSize = 100}) matchesEncodingEncodeTest
+  result4 <- quickCheckWithResult (stdArgs {maxSuccess = 1000000, maxSize = 100}) internalStringIsNeverTooShort
   counts <- runTestTT hunittests
   case (errors counts, failures counts, result1, result2, result3, result4) of
     (0, 0, Success {}, Success {}, Success {}, Success {}) -> exitSuccess
